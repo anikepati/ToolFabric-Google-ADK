@@ -1,1 +1,37 @@
+tools:
+  - name: "playwright"
+    command: ["npx", "@playwright/mcp@latest", "--headless"]
+    health_check:
+      type: "ping"
+      interval: 5  # seconds
+    mcp_clients:
+      - name: "playwright-client-1"
+        host: "localhost"
+        port: 8081
+        protocol: "stdio"
+        enabled: true
 
+  - name: "local_server"
+    command: ["python", "local_server.py"]
+    health_check:
+      type: "ping"
+      interval: 10
+    mcp_clients:
+      - name: "local-client"
+        host: "localhost"
+        port: 9090
+        protocol: "sse"
+        enabled: true
+
+  - name: "user_info"
+    module: "enterprise_tools.user"
+    function: "get_userInfo"
+    health_check:
+      type: "internal"
+      interval: 30
+    mcp_clients:
+      - name: "user-logger"
+        host: "logs.local"
+        port: 8000
+        protocol: "sse"
+        enabled: true
